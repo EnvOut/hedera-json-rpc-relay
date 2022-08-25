@@ -588,27 +588,18 @@ describe('HTS Precompile Acceptance Tests', async function () {
 
   // Depends on https://github.com/hashgraph/hedera-services/pull/3756
   xdescribe('HTS Precompile Token Expiry Info Tests', async function() {
-    it('should be able to get fungible token expiry info', async function() {
-      const getTokenExpiryInfoTx = (await baseHTSContract.getTokenExpiryInfoPublic(HTSTokenContractAddress));
-      const responseCode = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
-      const tokenExpiryInfo = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
+    it('should be able to get and update fungible token expiry info', async function() {
+      // get current expiry info
+      const getTokenExpiryInfoTxBefore = (await baseHTSContract.getTokenExpiryInfoPublic(HTSTokenContractAddress));
+      const responseCode = (await getTokenExpiryInfoTxBefore.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
+      const tokenExpiryInfoBefore = (await getTokenExpiryInfoTxBefore.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
 
       expect(responseCode).to.equal(TX_SUCCESS_CODE);
-      expect(tokenExpiryInfo.autoRenewPeriod).to.equal(7776000);
-      expect(tokenExpiryInfo.autoRenewAccount).to.equal(HTSTokenContractAddress);
-    });
+      expect(tokenExpiryInfoBefore.autoRenewPeriod).to.equal(7776000);
+      expect(tokenExpiryInfoBefore.autoRenewAccount).to.equal(HTSTokenContractAddress);
+      // add seconds check
 
-    it('should be able to get non fungible token expiry info', async function() {
-      const getTokenExpiryInfoTx = (await baseHTSContract.getTokenExpiryInfoPublic(NftHTSTokenContractAddress));
-      const responseCode = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
-      const tokenExpiryInfo = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
-
-      expect(responseCode).to.equal(TX_SUCCESS_CODE);
-      expect(tokenExpiryInfo.autoRenewPeriod).to.equal(7776000);
-      expect(tokenExpiryInfo.autoRenewAccount).to.equal(NftHTSTokenContractAddress);
-    });
-
-    it('should be able to update fungible token expiry info', async function() {
+      // update expiry info
       const expiryInfo = {
         autoRenewAccount: HTSTokenContractAddress,
         autoRenewPeriod: 6776000
@@ -616,17 +607,30 @@ describe('HTS Precompile Acceptance Tests', async function () {
       const updateTokenExpiryInfoTx = (await baseHTSContract.updateTokenExpiryInfoPublic(HTSTokenContractAddress, expiryInfo));
       const updateExpiryInfoResponseCode = (await updateTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
 
-      const getTokenExpiryInfoTx = (await baseHTSContract.getTokenExpiryInfoPublic(HTSTokenContractAddress));
-      const getExpiryInfoResponseCode = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
-      const tokenExpiryInfo = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
+      // get updated expiryInfo
+      const getTokenExpiryInfoTxAfter = (await baseHTSContract.getTokenExpiryInfoPublic(HTSTokenContractAddress));
+      const getExpiryInfoResponseCode = (await getTokenExpiryInfoTxAfter.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
+      const tokenExpiryInfoAfter = (await getTokenExpiryInfoTxAfter.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
 
       expect(updateExpiryInfoResponseCode).to.equal(TX_SUCCESS_CODE);
       expect(getExpiryInfoResponseCode).to.equal(TX_SUCCESS_CODE);
-      expect(tokenExpiryInfo.autoRenewPeriod).to.equal(expiryInfo.autoRenewPeriod);
-      expect(tokenExpiryInfo.autoRenewAccount).to.equal(expiryInfo.autoRenewAccount);
+      expect(tokenExpiryInfoAfter.autoRenewPeriod).to.equal(expiryInfo.autoRenewPeriod);
+      expect(tokenExpiryInfoAfter.autoRenewAccount).to.equal(expiryInfo.autoRenewAccount);
+      // add seconds check
     });
 
-    it('should be able to update non fungible token expiry info', async function() {
+    it('should be able to get and update non fungible token expiry info', async function() {
+      // get current expiry info
+      const getTokenExpiryInfoTxBefore = (await baseHTSContract.getTokenExpiryInfoPublic(NftHTSTokenContractAddress));
+      const responseCode = (await getTokenExpiryInfoTxBefore.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
+      const tokenExpiryInfoBefore = (await getTokenExpiryInfoTxBefore.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
+
+      expect(responseCode).to.equal(TX_SUCCESS_CODE);
+      expect(tokenExpiryInfoBefore.autoRenewPeriod).to.equal(7776000);
+      expect(tokenExpiryInfoBefore.autoRenewAccount).to.equal(NftHTSTokenContractAddress);
+      // add seconds check
+
+      // update expiry info
       const expiryInfo = {
         autoRenewAccount: NftHTSTokenContractAddress,
         autoRenewPeriod: 6776000
@@ -634,14 +638,16 @@ describe('HTS Precompile Acceptance Tests', async function () {
       const updateTokenExpiryInfoTx = (await baseHTSContract.updateTokenExpiryInfoPublic(NftHTSTokenContractAddress, expiryInfo));
       const updateExpiryInfoResponseCode = (await updateTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
 
-      const getTokenExpiryInfoTx = (await baseHTSContract.getTokenExpiryInfoPublic(NftHTSTokenContractAddress));
-      const getExpiryInfoResponseCode = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
-      const tokenExpiryInfo = (await getTokenExpiryInfoTx.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
+      // get updated expiryInfo
+      const getTokenExpiryInfoTxAfter = (await baseHTSContract.getTokenExpiryInfoPublic(NftHTSTokenContractAddress));
+      const getExpiryInfoResponseCode = (await getTokenExpiryInfoTxAfter.wait()).events.filter(e => e.event === 'ResponseCode')[0].args.responseCode;
+      const tokenExpiryInfoAfter = (await getTokenExpiryInfoTxAfter.wait()).events.filter(e => e.event === 'TokenExpiryInfo')[0].args.expiryInfo;
 
       expect(updateExpiryInfoResponseCode).to.equal(TX_SUCCESS_CODE);
       expect(getExpiryInfoResponseCode).to.equal(TX_SUCCESS_CODE);
-      expect(tokenExpiryInfo.autoRenewPeriod).to.equal(expiryInfo.autoRenewPeriod);
-      expect(tokenExpiryInfo.autoRenewAccount).to.equal(expiryInfo.autoRenewAccount);
+      expect(tokenExpiryInfoAfter.autoRenewPeriod).to.equal(expiryInfo.autoRenewPeriod);
+      expect(tokenExpiryInfoAfter.autoRenewAccount).to.equal(expiryInfo.autoRenewAccount);
+      // add seconds check
     });
   });
 
