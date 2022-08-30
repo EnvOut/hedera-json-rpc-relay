@@ -20,14 +20,14 @@
 
 import { Relay, RelayImpl, JsonRpcError, predefined, MirrorNodeClientError } from '@hashgraph/json-rpc-relay';
 import Koa from 'koa';
-import koaJsonRpc from 'koa-jsonrpc';
 import { collectDefaultMetrics, Histogram, Registry } from 'prom-client';
-
+import koaJsonRpc from '../src/koaJsonRpc/koaJsonRpc';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import pino from 'pino';
-
+import RateLimit from './ratelimit';
+ 
 const mainLogger = pino({
   name: 'hedera-json-rpc-relay',
   level: process.env.LOG_LEVEL || 'trace',
@@ -39,13 +39,14 @@ const mainLogger = pino({
     }
   }
 });
+
 const logger = mainLogger.child({ name: 'rpc-server' });
 const register = new Registry();
-
+const ratelimit = new RateLimit(1000);
 const relay: Relay = new RelayImpl(logger, register);
 const cors = require('koa-cors');
 const app = new Koa();
-const rpc = koaJsonRpc();
+const rpc = koaJsonRpc(ratelimit);
 
 const REQUEST_ID_STRING = `Request ID: `;
 const responseSuccessStatusCode = '200';
