@@ -19,7 +19,15 @@
  */
 
 import jsonResp from './lib/RpcResponse';
-import { ParseError, InvalidRequest, InternalError, RateLimitExceeded, MethodNotFound, Unauthorized, ServerError} from './lib/RpcError';
+import {
+  ParseError,
+  InvalidRequest,
+  InternalError,
+  RateLimitExceeded,
+  MethodNotFound,
+  Unauthorized,
+  ServerError,
+} from './lib/RpcError';
 import crypto from 'crypto';
 import parse from 'co-body';
 import InvalidParamsError from './lib/RpcInvalidError';
@@ -37,9 +45,9 @@ export default class koaJsonRpc {
   auth: any;
   ratelimit: RateLimit;
 
-  constructor (opts?) {
+  constructor(opts?) {
     this.limit = '1mb';
-    this.duration = 6000
+    this.duration = 60000;
     this.registry = Object.create(null);
     this.registryTotal = Object.create(null);
     this.methodConfig = methodConfiguration;
@@ -56,15 +64,12 @@ export default class koaJsonRpc {
       this.token = crypto.createHmac('sha256', this.auth.password).update(this.auth.username).digest('hex');
     }
   }
-  use (name, func, total?) {
+  use(name, func) {
     this.registry[name] = func;
     this.registryTotal[name] = this.methodConfig[name].total;
-    if (total) { 
-      this.registryTotal[name] = total;
-    }
   }
 
-  app () {
+  app() {
     return async (ctx, next) => {
       let body, result;
 
@@ -84,7 +89,12 @@ export default class koaJsonRpc {
         return;
       }
 
-      if (body.jsonrpc !== '2.0' || !hasOwnProperty(body, 'method') || !hasOwnProperty(body, 'id') || ctx.request.method !== 'POST') {
+      if (
+        body.jsonrpc !== '2.0' ||
+        !hasOwnProperty(body, 'method') ||
+        !hasOwnProperty(body, 'id') ||
+        ctx.request.method !== 'POST'
+      ) {
         ctx.body = jsonResp(body.id || null, new InvalidRequest(), null);
         return;
       }
@@ -96,7 +106,7 @@ export default class koaJsonRpc {
 
       const methodName = body.method;
       const methodTotalLimit = this.registryTotal[methodName];
-      if (this.ratelimit.shouldRateLimit(ctx.ip, methodName, methodTotalLimit)){
+      if (this.ratelimit.shouldRateLimit(ctx.ip, methodName, methodTotalLimit)) {
         ctx.body = jsonResp(body.id, new RateLimitExceeded(), null);
         return;
       }

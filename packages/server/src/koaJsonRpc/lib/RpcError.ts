@@ -19,85 +19,85 @@
  */
 
 export class JsonRpcError extends Error {
-    code: any;
-    data: any;
-    constructor (message, code, data) {
-      super();
-  
-      this.message = message;
-      this.code = code;
-  
-      if (typeof data !== 'undefined') {
-        this.data = data;
-      }
-    }
-  }
-  
-  export class ParseError extends JsonRpcError {
-    constructor () {
-      super('Parse error', -32700, undefined);
-    }
-  }
-  
-  export  class InvalidRequest extends JsonRpcError {
-    constructor () {
-      super('Invalid Request', -32600, undefined);
-    }
-  }
-  
-  export class MethodNotFound extends JsonRpcError {
-    constructor () {
-      super('Method not found', -32601, undefined);
-    }
-  }
-  
-  export class InvalidParams extends JsonRpcError {
-    constructor () {
-      super('Invalid params', -32602, undefined);
-    }
-  }
+  code: any;
+  data: any;
+  constructor(message, code, data) {
+    super();
 
-  export class InternalError extends JsonRpcError {
-    constructor (err) {
-      let message;
-      if (err && err.message) {
-        message = err.message;
-      } else {
-        message = 'Internal error';
-      }
-      super(message, -32603, undefined);
-    }
-  }
+    this.message = message;
+    this.code = code;
 
-  export class Unauthorized extends JsonRpcError {
-    constructor () {
-      super('Unauthorized', -32604, undefined);
+    if (typeof data !== 'undefined') {
+      this.data = data;
     }
   }
-  
-  export class ServerError extends JsonRpcError {
-    constructor (code) {
-      if (code < -32099 || code > -32000) {
-        throw new Error('Invalid error code');
-      }
-      super('Server error', code, undefined);
-    }
-  }
+}
 
-  export class RateLimitExceeded extends JsonRpcError {
-    constructor () {
-      super('Rate limit exceeded', -32605, undefined);
-    }
+export class ParseError extends JsonRpcError {
+  constructor() {
+    super('Parse error', -32700, undefined);
   }
-  
-  // module.exports = (...args) => new JsonRpcError(...(args as [any, any, any]));
-  // module.exports = Object.assign(module.exports, {
-  //   ParseError: (...args) => new ParseError(...(args as [])),
-  //   InvalidRequest: (...args) => new InvalidRequest(...(args as [])),
-  //   MethodNotFound: (...args) => new MethodNotFound(...(args as [])),
-  //   InvalidParams: (...args) => new InvalidParams(...(args as [])),
-  //   InternalError: (...args) => new InternalError(...(args as [any])),
-  //   ServerError: (...args) => new ServerError(...(args as [any])),
-  //   Unauthorized: (...args) => new Unauthorized(...(args as [])),
-  //   RateLimitExceeded: (...args) => new RateLimitExceeded(...(args as []))
-  // });
+}
+
+export class InvalidRequest extends JsonRpcError {
+  constructor() {
+    super('Invalid Request', -32600, undefined);
+  }
+}
+
+export class MethodNotFound extends JsonRpcError {
+  constructor() {
+    super('Method not found', -32601, undefined);
+  }
+}
+
+export class InvalidParams extends JsonRpcError {
+  constructor() {
+    super('Invalid params', -32602, undefined);
+  }
+}
+
+export class InternalError extends JsonRpcError {
+  constructor(err) {
+    let message;
+    if (err && err.message) {
+      message = err.message;
+    } else {
+      message = 'Internal error';
+    }
+    super(message, -32603, undefined);
+  }
+}
+
+export class Unauthorized extends JsonRpcError {
+  constructor() {
+    super('Unauthorized', -32604, undefined);
+  }
+}
+
+export class ServerError extends JsonRpcError {
+  constructor(code) {
+    if (code < -32099 || code > -32000) {
+      throw new Error('Invalid error code');
+    }
+    super('Server error', code, undefined);
+  }
+}
+
+export class RateLimitExceeded extends JsonRpcError {
+  constructor() {
+    super('Rate limit exceeded', -32605, undefined);
+  }
+}
+
+// module.exports = (...args) => new JsonRpcError(...(args as [any, any, any]));
+// module.exports = Object.assign(module.exports, {
+//   ParseError: (...args) => new ParseError(...(args as [])),
+//   InvalidRequest: (...args) => new InvalidRequest(...(args as [])),
+//   MethodNotFound: (...args) => new MethodNotFound(...(args as [])),
+//   InvalidParams: (...args) => new InvalidParams(...(args as [])),
+//   InternalError: (...args) => new InternalError(...(args as [any])),
+//   ServerError: (...args) => new ServerError(...(args as [any])),
+//   Unauthorized: (...args) => new Unauthorized(...(args as [])),
+//   RateLimitExceeded: (...args) => new RateLimitExceeded(...(args as []))
+// });

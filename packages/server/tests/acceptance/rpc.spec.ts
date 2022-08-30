@@ -1149,5 +1149,17 @@ describe('RPC Server Acceptance Tests', function () {
                 expect(Number(res.oldestBlock)).to.be.gt(0);
             });
         });
+
+        describe('RPC rate limit test', () => {
+            it('should throw rate limit exceeded error', async function() {
+                try{
+                    for (let index = 0; index < 201; index++) {
+                        await relay.call('eth_chainId', [null]);
+                    }
+                }catch(error) {
+                    Assertions.jsonRpcError(error, predefined.RATE_LIMIT_EXCEEDED);
+                }
+            });
+        });
     });
 });
