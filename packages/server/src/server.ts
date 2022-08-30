@@ -20,7 +20,7 @@
 
 import { Relay, RelayImpl, JsonRpcError, predefined, MirrorNodeClientError } from '@hashgraph/json-rpc-relay';
 import { collectDefaultMetrics, Histogram, Registry } from 'prom-client';
-import koaJsonRpc from './koaJsonRpc';
+import KoaJsonRpc from './koaJsonRpc';
 import crypto from 'crypto';
 import pino from 'pino';
 import path from 'path';
@@ -44,7 +44,7 @@ const register = new Registry();
 const relay: Relay = new RelayImpl(logger, register);
 const cors = require('koa-cors');
 const app = new Koa();
-const rpc = new koaJsonRpc();
+const rpc = new KoaJsonRpc();
 
 const REQUEST_ID_STRING = `Request ID: `;
 const responseSuccessStatusCode = '200';

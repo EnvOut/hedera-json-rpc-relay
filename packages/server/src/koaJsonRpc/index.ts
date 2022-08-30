@@ -25,8 +25,7 @@ import {
   InternalError,
   RateLimitExceeded,
   MethodNotFound,
-  Unauthorized,
-  ServerError,
+  Unauthorized
 } from './lib/RpcError';
 import crypto from 'crypto';
 import parse from 'co-body';
@@ -35,7 +34,7 @@ import { methodConfiguration } from './lib/methodConfiguration';
 import RateLimit from '../ratelimit';
 const hasOwnProperty = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
 
-export default class koaJsonRpc {
+export default class KoaJsonRpc {
   registry: any;
   registryTotal: any;
   token: any;
@@ -76,7 +75,7 @@ export default class koaJsonRpc {
       if (this.token) {
         const headerToken = ctx.get('authorization').split(' ').pop();
         if (headerToken !== this.token) {
-          ctx.body = jsonResp(null, new Unauthorized(), null);
+          ctx.body = jsonResp(null, new Unauthorized(), undefined);
           return;
         }
       }
@@ -84,7 +83,7 @@ export default class koaJsonRpc {
       try {
         body = await parse.json(ctx, { limit: this.limit });
       } catch (err) {
-        const errBody = jsonResp(null, new ParseError(), null);
+        const errBody = jsonResp(null, new ParseError(), undefined);
         ctx.body = errBody;
         return;
       }
@@ -95,30 +94,30 @@ export default class koaJsonRpc {
         !hasOwnProperty(body, 'id') ||
         ctx.request.method !== 'POST'
       ) {
-        ctx.body = jsonResp(body.id || null, new InvalidRequest(), null);
+        ctx.body = jsonResp(body.id || null, new InvalidRequest(), undefined);
         return;
       }
 
       if (!this.registry[body.method]) {
-        ctx.body = jsonResp(body.id, new MethodNotFound(), null);
+        ctx.body = jsonResp(body.id, new MethodNotFound(), undefined);
         return;
       }
 
       const methodName = body.method;
       const methodTotalLimit = this.registryTotal[methodName];
       if (this.ratelimit.shouldRateLimit(ctx.ip, methodName, methodTotalLimit)) {
-        ctx.body = jsonResp(body.id, new RateLimitExceeded(), null);
+        ctx.body = jsonResp(body.id, new RateLimitExceeded(), undefined);
         return;
       }
 
       try {
         result = await this.registry[body.method](body.params);
-      } catch (e) {
+      } catch (e: any) {
         if (e instanceof InvalidParamsError) {
-          ctx.body = jsonResp(body.id, new InvalidParamsError(e.message), null);
+          ctx.body = jsonResp(body.id, new InvalidParamsError(e.message), undefined);
           return;
         }
-        ctx.body = jsonResp(body.id, new InternalError(e), null);
+        ctx.body = jsonResp(body.id, new InternalError(e.message), undefined);
         return;
       }
 

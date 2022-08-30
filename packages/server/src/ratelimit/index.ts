@@ -87,7 +87,7 @@ export default class RateLimit {
 
   private reset(ip: string, methodName: string, total: number) {
     this.database[ip].reset = Date.now() + this.duration;
-    for (const [key, value] of Object.entries(this.database[ip].methodInfo)) {
+    for (const [key] of Object.entries(this.database[ip].methodInfo)) {
       this.database[ip].methodInfo[key].remaining = this.database[ip].methodInfo[key].total;
     }
     this.database[ip].methodInfo[methodName].remaining = total;
