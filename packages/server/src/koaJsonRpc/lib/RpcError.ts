@@ -89,15 +89,3 @@ export class RateLimitExceeded extends JsonRpcError {
     super('Rate limit exceeded', -32605, undefined);
   }
 }
-
-// module.exports = (...args) => new JsonRpcError(...(args as [any, any, any]));
-// module.exports = Object.assign(module.exports, {
-//   ParseError: (...args) => new ParseError(...(args as [])),
-//   InvalidRequest: (...args) => new InvalidRequest(...(args as [])),
-//   MethodNotFound: (...args) => new MethodNotFound(...(args as [])),
-//   InvalidParams: (...args) => new InvalidParams(...(args as [])),
-//   InternalError: (...args) => new InternalError(...(args as [any])),
-//   ServerError: (...args) => new ServerError(...(args as [any])),
-//   Unauthorized: (...args) => new Unauthorized(...(args as [])),
-//   RateLimitExceeded: (...args) => new RateLimitExceeded(...(args as []))
-// });

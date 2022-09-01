@@ -27,7 +27,6 @@ import {
   MethodNotFound,
   Unauthorized
 } from './lib/RpcError';
-import crypto from 'crypto';
 import parse from 'co-body';
 import InvalidParamsError from './lib/RpcInvalidError';
 import { methodConfiguration } from './lib/methodConfiguration';
@@ -41,7 +40,6 @@ export default class KoaJsonRpc {
   methodConfig: any;
   duration: number;
   limit: string;
-  auth: any;
   ratelimit: RateLimit;
 
   constructor(opts?) {
@@ -52,16 +50,9 @@ export default class KoaJsonRpc {
     this.methodConfig = methodConfiguration;
     if (opts) {
       this.limit = opts.limit || this.limit;
-      this.auth = opts.auth;
       this.duration = opts.limit || this.limit;
     }
     this.ratelimit = new RateLimit(this.duration);
-    if (this.auth && (!hasOwnProperty(this.auth, 'username') || !hasOwnProperty(this.auth, 'password'))) {
-      throw new Error('Invalid options parameters!');
-    }
-    if (this.auth) {
-      this.token = crypto.createHmac('sha256', this.auth.password).update(this.auth.username).digest('hex');
-    }
   }
   use(name, func) {
     this.registry[name] = func;
